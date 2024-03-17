@@ -5,7 +5,7 @@ export const UsePets = (url) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(()=> {
+    useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await fetch(url);
@@ -25,5 +25,5 @@ export const UsePets = (url) => {
     }, [url]);
 
     return { data, loading, error };
-    
+
 }
