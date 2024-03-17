@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import style from './login.module.scss';
+import { useNavigate } from 'react-router-dom';
 
 export const Login = () => {
     const [formData, setFormData] = useState({
@@ -7,7 +8,7 @@ export const Login = () => {
         password: ''
     });
     const [errors, setErrors] = useState({});
-
+    const navigate = useNavigate();
 
     const handleChange = (event) => {
         setFormData({ ...formData, [event.target.name]: event.target.value });
@@ -27,15 +28,32 @@ export const Login = () => {
         return errors;
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const formErrors = validateForm();
         if (Object.keys(formErrors).length === 0) {
-            console.log(formData);
+            try {
+                const response = await fetch('http://localhost:4000/auth/login', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ email: formData.email, password: formData.password }),
+                });
+    
+                if (response.ok) {
+                    navigate('/cars');
+                } else {
+                    // Handle login failure
+                    console.log('Login failed.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+            }
         } else {
-            setErrors(errors);
+            setErrors(formErrors);
         }
-    }
+    };
+    
 
     return (
         <div>
