@@ -1,34 +1,35 @@
-import { useState } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import style from './login.module.scss';
 import { useNavigate } from 'react-router-dom';
+import { UserData, UserErrors } from './IUser';
 
-export const Login = () => {
-    const [formData, setFormData] = useState({
+export const Login: React.FC = () => {
+    const [formData, setFormData] = useState<UserData>({
         email: '',
         password: ''
     });
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState<UserErrors>({});
     const navigate = useNavigate();
 
-    const handleChange = (event) => {
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [event.target.name]: event.target.value });
     };
 
-    const validateForm = (event) => {
-        let errors = {};
+    const validateForm = (): UserErrors => {
+        let formErrors: UserErrors = {};
         if (!formData.email) {
-            errors.email = 'Email is required';
+            formErrors.email = 'Email is required';
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            errors.password = 'Email address is invalid';
+            formErrors.email = 'Email address is invalid'; // Corrected to `email` from `password` for email validation
         }
 
         if (!formData.password) {
-            errors.password = 'Password is required';
+            formErrors.password = 'Password is required';
         }
-        return errors;
+        return formErrors;
     };
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formErrors = validateForm();
         if (Object.keys(formErrors).length === 0) {
@@ -43,7 +44,6 @@ export const Login = () => {
                 if (response.ok) {
                     navigate('/cars');
                 } else {
-                    // Handle login failure
                     console.log('Login failed.');
                 }
             } catch (error) {
@@ -53,20 +53,19 @@ export const Login = () => {
             setErrors(formErrors);
         }
     };
-    
 
     return (
         <div>
             <form onSubmit={handleSubmit} noValidate className={style.container}>
                 <label>Email</label>
-                <input type="text" name='email' value={formData.email} onChange={handleChange} />
+                <input type="text" name="email" value={formData.email} onChange={handleChange} />
                 {errors.email && <p className={style.error}>{errors.email}</p>}
 
                 <label>Password</label>
-                <input type="password" name='password' value={formData.password} onChange={handleChange} />
+                <input type="password" name="password" value={formData.password} onChange={handleChange} />
                 {errors.password && <p className={style.error}>{errors.password}</p>}
                 <button type="submit" className={style.button}>Login</button>
             </form>
         </div>
-    )
+    );
 }
